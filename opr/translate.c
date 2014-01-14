@@ -82,9 +82,10 @@ void analyze_lmw_smw(char *line)
 	sscanf(ra,"%s",ra);
 	sscanf(enable4,"%d",&ienable4);
 
-	if(op[0]=='s'&&op[1]=='m'&&op[2]=='w') 
+	if(op[0]=='s'&&op[1]=='m'&&op[2]=='w') strcpy(opcode,"swi");
+	if(op[0]=='l'&&op[1]=='m'&&op[2]=='w') strcpy(opcode,"lwi");
+	if(op[5]=='d')
 	{
-		strcpy(opcode,"swi");
 		if(ienable4&0x1) pcode(opcode,"$sp",ra,&s,&b,&n);
 		if(ienable4&0x2) pcode(opcode,"$lp",ra,&s,&b,&n);
 		if(ienable4&0x4) pcode(opcode,"$gp",ra,&s,&b,&n);
@@ -102,9 +103,8 @@ void analyze_lmw_smw(char *line)
 			}
 		}
 	}
-	if(op[0]=='l'&&op[1]=='m'&&op[2]=='w') 
+	if(op[5]=='i')
 	{
-		strcpy(opcode,"lwi");
 		if(strcmp(rb,"$sp,"))
 		{
 			for(i=0;i<strlen(rb);i++) if(rb[i]=='$'||rb[i]=='r'||rb[i]==',') rb[i]=' ';
