@@ -1,77 +1,75 @@
-	.equ UART_ENABLE,   0x02000000
-	.equ UART_TX_FLAG,  0x02000010
-	.equ UART_RX_FLAG,  0x02000014
-	.equ UART_TX_DATA,  0x02000020
-	.equ UART_RX_DATA,  0x02000024
-	.equ UART_BAUDRATE, 0x02000030
 
 	.equ STACK_ADDR, 0x01001000
 
-	.text
-	.globl _start
+	.section "vectors"
 _start:
+	j	Reset_Handler
+	j	Syscall_Handler
+
+Reset_Handler:
+
+init_data:
+	la	$r0, _etext
+	la	$r1, _sdata
+	la	$r2, data_size
+	la	$r3, #0x000000FF
+copy_data:
+	beqz	$r2, init_bss
+	lwi.bi	$r4, [$r0], #4
+
+	addi	$r5, $r4, #0
+	and	$r4, $r4, $r3
+
+	slli	$r4, $r4, #8
+	srli	$r5, $r5, #8
+	and	$r6, $r5, $r3
+	or	$r4, $r4, $r6
+
+	slli	$r4, $r4, #8
+	srli	$r5, $r5, #8
+	and	$r6, $r5, $r3
+	or	$r4, $r4, $r6
+
+	slli	$r4, $r4, #8
+	srli	$r5, $r5, #8
+	and	$r6, $r5, $r3
+	or	$r4, $r4, $r6
+
+
+	swi.bi	$r4, [$r1], #4
+	addi	$r2, $r2, #-4
+	j	copy_data
+
+init_bss:
+	la	$r0, _sbss
+	la	$r1, bss_size
+zero_bss:
+	beqz	$r1, init_sp
+	movi	$r2, #0
+	swi.bi	$r2, [$r0], #4
+	addi	$r1, $r1, #-4
+	j	zero_bss
+
+init_sp:
 	la	$sp, STACK_ADDR
-	la	$r0, 'H'
-	jal	mputc
 
-	!movi	$r0, #12
-	!movi	$r0, #12345
-	!movi	$r0, #0
-	movi	$r0, #-12345
-	!jal	div_u10
-	!jal	mod_u10
-	jal	mputn
-
-	la	$r0, '\n'
-	jal	mputc
-
-	la	$r0, hello
+	la	$r0, boot_check
 	jal	mputs
-	!j	loop
+	syscall #7
 	j	main
+
+Syscall_Handler:
+	la	$r0, syscall_check
+	jal	mputs
+	iret
+
+	.text
 loop:	j	loop
-!
-!	la	$r0, UART_BAUDRATE
-!	movi	$r1, #9600
-!	swi	$r1, [$r0+#0]
-!	la	$r0, UART_ENABLE
-!	movi	$r1, #1
-!	swi	$r1, [$r0+#0]
-!
-!	la	$r5, UART_TX_FLAG
-!	la	$r6, UART_TX_DATA
-!	movi	$r7, #1
-!	movi	$r8, #0x3
-!	la	$r9, #0xFFFFFFFC
-!
-!	la	$r0, hello
-!	jal	put
-!
-!	j	loop
-!	j	main
-!
-!	.globl	put
-!put:	
-!	and	$r2, $r0, $r8
-!	and	$r1, $r0, $r9
-!	lwi	$r1, [$r1+#0]
-!	slli	$r2, $r2, #3
-!	srl	$r1, $r1, $r2
-!	andi	$r1, $r1, #0xFF
-!	bnez	$r1, put_wait
-!	jr	$lp
-!
-!put_wait:
-!	lwi	$r2, [$r5+#0]
-!	bnez	$r2, put_wait
-!	swi	$r1, [$r6+#0]
-!	swi	$r7, [$r5+#0]
-!	addi	$r0, $r0, #1
-!	j	put
-!
-!loop:	j	loop
 
 	.data
-hello:	.asciz "HELLO! THIS IS BOOT\n"
-	.byte 0
-	.align
+boot_check:	
+	.asciz "THIS IS BOOT\n"
+	.align 4
+syscall_check:
+	.asciz "THIS IS SYSCALL\n"
+	.align 4
