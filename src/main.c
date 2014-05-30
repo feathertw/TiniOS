@@ -3,8 +3,28 @@ void mputs(char*);
 void qsort_task();
 void gcd_task();
 void bcd_task();
+int mod_u10(int n);
+#define SYSTICK_CONTROL 	*(volatile int *)(0x0E100000)
+#define SYSTICK_RELOAD_VALUE 	*(volatile int *)(0x0E100004)
+#define SYSTICK_STATUS	 	*(volatile int *)(0x0E101000)
+#define SYSTICK_CURRENT_VALUE 	*(volatile int *)(0x0E101004)
+#define SYSTICK_CONTROL_ENABLE       1
+#define SYSTICK_CONTROL_CLEAR        2
+#define SYSTICK_CONTROL_CONTINUOUS   4
 int main()
 {
+	SYSTICK_RELOAD_VALUE=300;
+	SYSTICK_CONTROL=SYSTICK_CONTROL_ENABLE|SYSTICK_CONTROL_CONTINUOUS;
+
+	int i=300;
+	while(i--)
+	{
+		char c = '#';
+		mputc(c);
+	}
+	SYSTICK_CONTROL=0;
+	//while(1);
+
 	char *main_check="THIS IS MAIN\n";
 	mputs(main_check);
 

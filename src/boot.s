@@ -5,6 +5,12 @@
 _start:
 	j	Reset_Handler
 	j	Syscall_Handler
+	j	Systick_Handler
+	.word
+	.word
+	.word
+	.word
+	.word
 
 Reset_Handler:
 
@@ -63,6 +69,14 @@ Syscall_Handler:
 	jal	mputs
 	iret
 
+Systick_Handler:
+	#j	new_systick_handler
+	movi	$r0, '@'
+	jal	mputc
+	#la	$r0, systick_check
+	#jal	mputs
+	iret
+
 	.text
 loop:	j	loop
 
@@ -72,4 +86,7 @@ boot_check:
 	.align 4
 syscall_check:
 	.asciz "THIS IS SYSCALL\n"
+	.align 4
+systick_check:
+	.asciz "THIS IS SYSTICK\n"
 	.align 4
