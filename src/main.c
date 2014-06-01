@@ -2,34 +2,58 @@
 #include "mlib.h"
 #include "task.h"
 
+#define TASK_NUM_LIMIT  8
 #define TASK_STACK_SIZE 256
 #define PRESERVE_REGSET 32
 
 void syscall();
 RegSet *to_user_mode(RegSet *stack);
-int init_task()
+void init_task()
 {
-	mputs("1: THIS IS INIT_TASK\n");
-	syscall();
-	mputs("2: THIS IS INIT_TASK\n");
-	syscall();
-	while(1);
+	int i=0;
+	while(1)
+	{
+		mputn(i++); mputc(' ');
+		mputs("THIS IS INIT_TASK\n");
+		syscall();
+	}
 }
+void second_task()
+{
+	int i=0;
+	while(1)
+	{
+		mputn(i++); mputc(' ');
+		mputs("THIS IS SECOND_TASK\n");
+		syscall();
+	}
+}
+RegSet *set_task(unsigned int *task_stack, void (*start)() )
+{
+	RegSet *rs= (RegSet *)task_stack+TASK_STACK_SIZE-PRESERVE_REGSET;
+	rs->pc = (unsigned int)start;
+	return rs;
+}
+
 int main()
 {
 	mputs("THIS IS MAIN\n");
+	unsigned int task_number =0;
+	unsigned int task_currnet=0;
 
-	unsigned int task_stack[TASK_STACK_SIZE];
-	RegSet *rs= (RegSet *)task_stack+TASK_STACK_SIZE-PRESERVE_REGSET;
-	rs->pc = (unsigned int) &init_task;
+	unsigned int task_stack[TASK_NUM_LIMIT][TASK_STACK_SIZE];
+	RegSet *rs[TASK_NUM_LIMIT];
 
-	mputs("1: START!\n");
-	rs = to_user_mode(rs);
-	mputs("2: BACK!\n");
+	rs[task_number]=set_task(task_stack[task_number],&init_task);
+	task_number++;
+	rs[task_number]=set_task(task_stack[task_number],&second_task);
+	task_number++;
 
-	mputs("2: START!\n");
-	rs = to_user_mode(rs);
-	mputs("2: BACK!\n");
+	while(1)
+	{
+		rs[task_currnet] = to_user_mode(rs[task_currnet]);
+		task_currnet=(task_currnet+1>=task_number)?0:task_currnet+1;
+	}
 
 	while(1);
 

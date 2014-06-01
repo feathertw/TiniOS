@@ -65,8 +65,8 @@ init_sp:
 	j	main
 
 Syscall_Handler:
-	la	$r0, syscall_check
-	jal	mputs
+	!la	$r0, syscall_check
+	!jal	mputs
 	la	$lp, to_kernel_mode
 	jr	$lp
 	!iret

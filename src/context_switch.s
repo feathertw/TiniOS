@@ -1,7 +1,7 @@
 	.globl	to_kernel_mode
 to_kernel_mode:
-	la	$r0, tkm_check
-	jal	mputs
+	!la	$r0, tkm_check
+	!jal	mputs
 	mfsr	$r0, $P_P1
 	smw.adm	$r4, [$r0], $r27, 0
 

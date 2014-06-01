@@ -3,10 +3,10 @@
 syscall:
 	syscall #7
 	
-	smw.adm	$sp, [$sp], $sp, 2
-	la	$r0, check
-	jal	mputs
-	lmw.bim $sp, [$sp], $sp, 2
+	!smw.adm	$sp, [$sp], $sp, 2
+	!la	$r0, check
+	!jal	mputs
+	!lmw.bim $sp, [$sp], $sp, 2
 
 	jr	$lp
 
