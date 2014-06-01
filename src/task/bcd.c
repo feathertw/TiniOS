@@ -1,7 +1,4 @@
-int div_u10(int n);
-int mod_u10(int n);
-void mputs(char*);
-void mputc(char);
+#include "mlib.h"
 void bcd(int n)
 {
 	int mm;

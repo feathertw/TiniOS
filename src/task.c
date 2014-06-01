@@ -1,17 +1,9 @@
-int  mgetn();
-int  mgets(int*);
-void mputn(int);
-void mputs(char*);
-void mputc(char);
+#include "mlib.h"
 
 void qsort(int *array, int left, int right);
 int  gcd(int m, int n);
 void bcd(int n);
 void show_array(int *array, int n);
-
-void qsort_task();
-void gcd_task();
-void bcd_task();
 
 void show_array(int *array, int n)
 {

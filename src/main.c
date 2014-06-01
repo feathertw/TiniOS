@@ -1,41 +1,37 @@
-int  mgetn();
-void mputs(char*);
-void qsort_task();
-void gcd_task();
-void bcd_task();
-int mod_u10(int n);
-#define SYSTICK_CONTROL 	*(volatile int *)(0x0E100000)
-#define SYSTICK_RELOAD_VALUE 	*(volatile int *)(0x0E100004)
-#define SYSTICK_STATUS	 	*(volatile int *)(0x0E101000)
-#define SYSTICK_CURRENT_VALUE 	*(volatile int *)(0x0E101004)
-#define SYSTICK_CONTROL_ENABLE       1
-#define SYSTICK_CONTROL_CLEAR        2
-#define SYSTICK_CONTROL_CONTINUOUS   4
+#include "main.h"
+#include "mlib.h"
+#include "task.h"
+
+#define TASK_STACK_SIZE 256
+#define PRESERVE_REGSET 32
+
+void syscall();
+RegSet *to_user_mode(RegSet *stack);
+int init_task()
+{
+	mputs("1: THIS IS INIT_TASK\n");
+	syscall();
+	mputs("2: THIS IS INIT_TASK\n");
+	syscall();
+	while(1);
+}
 int main()
 {
-	SYSTICK_RELOAD_VALUE=300;
-	SYSTICK_CONTROL=SYSTICK_CONTROL_ENABLE|SYSTICK_CONTROL_CONTINUOUS;
+	mputs("THIS IS MAIN\n");
 
-	int i=300;
-	while(i--)
-	{
-		char c = '#';
-		mputc(c);
-	}
-	SYSTICK_CONTROL=0;
-	//while(1);
+	unsigned int task_stack[TASK_STACK_SIZE];
+	RegSet *rs= (RegSet *)task_stack+TASK_STACK_SIZE-PRESERVE_REGSET;
+	rs->pc = (unsigned int) &init_task;
 
-	char *main_check="THIS IS MAIN\n";
-	mputs(main_check);
+	mputs("1: START!\n");
+	rs = to_user_mode(rs);
+	mputs("2: BACK!\n");
 
-	//int i;
-	//int n;
-	//int string_array[100];
-	//char *mget_check="THIS IS MGET";
-	//mputs(mget_check);
-	//n=mgets(string_array);
-	//for(i=0;i<n;i++) mputc(string_array[i]);
-	//mputc('\n');
+	mputs("2: START!\n");
+	rs = to_user_mode(rs);
+	mputs("2: BACK!\n");
+
+	while(1);
 
 	int n;
 	while(n!=9)

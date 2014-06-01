@@ -61,13 +61,15 @@ init_sp:
 
 	la	$r0, boot_check
 	jal	mputs
-	syscall #7
+	!syscall #7
 	j	main
 
 Syscall_Handler:
 	la	$r0, syscall_check
 	jal	mputs
-	iret
+	la	$lp, to_kernel_mode
+	jr	$lp
+	!iret
 
 Systick_Handler:
 	#j	new_systick_handler
@@ -81,12 +83,7 @@ Systick_Handler:
 loop:	j	loop
 
 	.data
-boot_check:	
-	.asciz "THIS IS BOOT\n"
-	.align 4
-syscall_check:
-	.asciz "THIS IS SYSCALL\n"
-	.align 4
-systick_check:
-	.asciz "THIS IS SYSTICK\n"
+boot_check:	.asciz "THIS IS BOOT\n"
+syscall_check:	.asciz "THIS IS SYSCALL\n"
+systick_check:	.asciz "THIS IS SYSTICK\n"
 	.align 4
