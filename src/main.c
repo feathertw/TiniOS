@@ -8,25 +8,23 @@
 
 void syscall();
 RegSet *to_user_mode(RegSet *stack);
-void init_task()
+void counter(int t, int c)
 {
-	int i=0;
+	int i;
 	while(1)
 	{
-		mputn(i++); mputc(' ');
-		mputs("THIS IS INIT_TASK\n");
-		syscall();
+		i=t;
+		while(i--);
+		mputc(c);
 	}
+}
+void init_task()
+{
+	counter(1000,'@');
 }
 void second_task()
 {
-	int i=0;
-	while(1)
-	{
-		mputn(i++); mputc(' ');
-		mputs("THIS IS SECOND_TASK\n");
-		syscall();
-	}
+	counter(1000,'#');
 }
 RegSet *set_task(unsigned int *task_stack, void (*start)() )
 {
@@ -48,6 +46,9 @@ int main()
 	task_number++;
 	rs[task_number]=set_task(task_stack[task_number],&second_task);
 	task_number++;
+
+	SYSTICK_RELOAD_VALUE=3000;
+	SYSTICK_CONTROL=SYSTICK_CONTROL_ENABLE|SYSTICK_CONTROL_CONTINUOUS;
 
 	while(1)
 	{

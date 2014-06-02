@@ -72,12 +72,14 @@ Syscall_Handler:
 	!iret
 
 Systick_Handler:
+	la	$lp, to_kernel_mode
+	jr	$lp
 	#j	new_systick_handler
-	movi	$r0, '@'
-	jal	mputc
+	#movi	$r0, '@'
+	#jal	mputc
 	#la	$r0, systick_check
 	#jal	mputs
-	iret
+	#iret
 
 	.text
 loop:	j	loop
