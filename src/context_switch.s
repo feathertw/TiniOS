@@ -14,6 +14,7 @@ to_user_mode:
 
 	movi	$r1, #1
 	mtsr	$r1, $PSW
+	mtsr	$r1, $IPSW
 
 	addi	$sp, $r0, #0
 	lmw.bim $r4, [$sp], $r27,  0
