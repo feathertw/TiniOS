@@ -6,8 +6,10 @@
 #define SYSTICK_CONTROL_CLEAR        2
 #define SYSTICK_CONTROL_CONTINUOUS   4
 
+typedef unsigned int uint;
 typedef struct
 {
+	unsigned int it_number;
 	unsigned int r4;
 	unsigned int r5;
 	unsigned int r6;

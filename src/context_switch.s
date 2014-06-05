@@ -3,7 +3,7 @@ to_kernel_mode:
 	!la	$r0, tkm_check
 	!jal	mputs
 	mfsr	$r0, $P_P1
-	smw.adm	$r4, [$r0], $r27, 0
+	smw.adm	$r3, [$r0], $r27, 0
 
 	lmw.bim $r1, [$sp], $r27, 14
 	jr	$lp
@@ -16,7 +16,7 @@ to_user_mode:
 	mtsr	$r1, $PSW
 	mtsr	$r1, $IPSW
 
-	addi	$sp, $r0, #0
+	addi	$sp, $r0, #4
 	lmw.bim $r4, [$sp], $r27,  0
 
 	!la	$r0, tum_check

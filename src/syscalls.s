@@ -1,4 +1,3 @@
-
 	.globl syscall
 syscall:
 	syscall #7
@@ -8,6 +7,11 @@ syscall:
 	!jal	mputs
 	!lmw.bim $sp, [$sp], $sp, 2
 
+	jr	$lp
+
+	.globl fork
+fork:
+	syscall #0x1
 	jr	$lp
 
 	.data

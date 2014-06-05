@@ -65,21 +65,19 @@ init_sp:
 	j	main
 
 Syscall_Handler:
-	!la	$r0, syscall_check
-	!jal	mputs
+	mfsr	$r3, $P_P1
+	lwi	$r3, [$r3+#28]
+	addi	$r3, $r3, #-4
+	lwi	$r3, [$r3+#0]
+	srli	$r3, $r3, #5
+	andi	$r3, $r3, #0x7FFF
 	la	$lp, to_kernel_mode
 	jr	$lp
-	!iret
 
 Systick_Handler:
+	movi	$r3, #0x9
 	la	$lp, to_kernel_mode
 	jr	$lp
-	#j	new_systick_handler
-	#movi	$r0, '@'
-	#jal	mputc
-	#la	$r0, systick_check
-	#jal	mputs
-	#iret
 
 	.text
 loop:	j	loop
