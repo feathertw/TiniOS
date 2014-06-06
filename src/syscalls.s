@@ -1,6 +1,6 @@
 	.globl syscall
 syscall:
-	syscall #7
+	syscall #0x8
 	
 	!smw.adm	$sp, [$sp], $sp, 2
 	!la	$r0, check
@@ -12,6 +12,11 @@ syscall:
 	.globl fork
 fork:
 	syscall #0x1
+	jr	$lp
+
+	.globl getpid
+getpid:
+	syscall #0x2
 	jr	$lp
 
 	.data

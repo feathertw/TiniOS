@@ -1,4 +1,11 @@
 #include "mtype.h"
+#include "mlib.h"
+void mputo(char* s, int n)
+{
+	mputs(s);
+	mputn(n);
+	mputc('\n');
+}
 void *imemcpy(void *dest, void *src, uint n)
 {
 	uint *d = dest;

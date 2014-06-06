@@ -8,10 +8,13 @@
 #define PRESERVE_REGSET 32+1
 
 #define IT_FORK 	0x1
+#define IT_GETPID 	0x2
+#define IT_SYSCALL	0x8
 #define IT_SYSTICK	0x9
 
 void syscall();
 int fork();
+int getpid();
 RegSet *to_user_mode(RegSet *stack);
 void counter(int t, int c)
 {
@@ -25,12 +28,15 @@ void counter(int t, int c)
 }
 void second_task()
 {
+	mputo("PID:",getpid());
 	counter(1000,'#');
+	while(1);
 }
 void init_task()
 {
 	mputs("THIS IS INIT_TASK\n");
 	if( !fork() ) second_task();
+	syscall();
 	counter(1000,'@');
 }
 RegSet *set_task(uint *task_stack, void (*start)() )
@@ -52,8 +58,8 @@ int main()
 	rs[task_number]=set_task(task_stack[task_number],&init_task);
 	task_number++;
 
-	SYSTICK_RELOAD_VALUE=5000;
-	SYSTICK_CONTROL=SYSTICK_CONTROL_ENABLE|SYSTICK_CONTROL_CONTINUOUS;
+	//SYSTICK_RELOAD_VALUE=5000;
+	//SYSTICK_CONTROL=SYSTICK_CONTROL_ENABLE|SYSTICK_CONTROL_CONTINUOUS;
 
 	while(1)
 	{
@@ -77,6 +83,11 @@ int main()
 					rs[task_number]->r0=0;
 					task_number++;
 				}
+				break;
+			case IT_GETPID:
+				rs[task_currnet]->r0=task_currnet;
+				break;
+			case IT_SYSCALL:
 				break;
 			case IT_SYSTICK:
 				break;

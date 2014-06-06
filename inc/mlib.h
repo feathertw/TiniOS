@@ -4,6 +4,7 @@ int  mgets(int*);
 void mputn(int);
 void mputs(char*);
 void mputc(char);
+void mputo(char*, int);
 
 int div_u10(int n);
 int mul_u10(int n);
