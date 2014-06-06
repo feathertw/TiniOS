@@ -1,3 +1,4 @@
+#include "mtype.h"
 #include "mlib.h"
 
 void qsort(int *array, int left, int right);

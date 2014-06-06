@@ -9,4 +9,4 @@ int div_u10(int n);
 int mul_u10(int n);
 int mod_u10(int n);
 
-void *imemcpy(void *dest, void *src, unsigned int n);
+void *imemcpy(void *dest, void *src, uint n);

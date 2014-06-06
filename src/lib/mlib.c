@@ -1,8 +1,9 @@
-void *imemcpy(void *dest, void *src, unsigned int n)
+#include "mtype.h"
+void *imemcpy(void *dest, void *src, uint n)
 {
-	unsigned int *d = dest;
-	const unsigned int *s = src;
-	unsigned int i;
+	uint *d = dest;
+	const uint *s = src;
+	uint i;
 	for(i=0;i<n;i++)
 	{
 		d[i]=s[i];

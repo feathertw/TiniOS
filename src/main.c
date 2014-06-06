@@ -1,3 +1,4 @@
+#include "mtype.h"
 #include "main.h"
 #include "mlib.h"
 #include "task.h"
@@ -32,20 +33,20 @@ void init_task()
 	if( !fork() ) second_task();
 	counter(1000,'@');
 }
-RegSet *set_task(unsigned int *task_stack, void (*start)() )
+RegSet *set_task(uint *task_stack, void (*start)() )
 {
 	RegSet *rs= (RegSet *)(task_stack+TASK_STACK_SIZE-PRESERVE_REGSET);
-	rs->pc = (unsigned int)start;
+	rs->pc = (uint)start;
 	return rs;
 }
 
 int main()
 {
 	mputs("THIS IS MAIN\n");
-	unsigned int task_number =0;
-	unsigned int task_currnet=0;
+	uint task_number =0;
+	uint task_currnet=0;
 
-	unsigned int task_stack[TASK_NUM_LIMIT][TASK_STACK_SIZE];
+	uint task_stack[TASK_NUM_LIMIT][TASK_STACK_SIZE];
 	RegSet *rs[TASK_NUM_LIMIT];
 
 	rs[task_number]=set_task(task_stack[task_number],&init_task);
@@ -66,8 +67,8 @@ int main()
 				}
 				else
 				{
-					unsigned int used=(task_stack[task_currnet])+
-						(TASK_STACK_SIZE)-(unsigned int *)(rs[task_currnet]);
+					uint used=(task_stack[task_currnet])+
+						(TASK_STACK_SIZE)-(uint *)(rs[task_currnet]);
 					rs[task_number]=(RegSet *)
 						(task_stack[task_number]+(TASK_STACK_SIZE)-used);
 					imemcpy(rs[task_number],rs[task_currnet],used);
