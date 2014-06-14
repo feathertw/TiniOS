@@ -16,20 +16,20 @@ void syscall();
 int fork();
 int getpid();
 RegSet *to_user_mode(RegSet *stack);
-void counter(int t, int c)
+void counter(int t, char *s)
 {
 	int i;
 	while(1)
 	{
 		i=t;
 		while(i--);
-		mputc(c);
+		mputs(s);
 	}
 }
 void second_task()
 {
 	mputo("PID:",getpid());
-	counter(1000,'#');
+	counter(1000,"ABCDEFGHIJK\n");
 	while(1);
 }
 void init_task()
@@ -37,7 +37,7 @@ void init_task()
 	mputs("THIS IS INIT_TASK\n");
 	if( !fork() ) second_task();
 	syscall();
-	counter(1000,'@');
+	counter(1000,"abcdefghijk\n");
 }
 RegSet *set_task(uint *task_stack, void (*start)() )
 {
@@ -51,6 +51,7 @@ int main()
 	mputs("THIS IS MAIN\n");
 	uint task_number =0;
 	uint task_currnet=0;
+	//mputo("TASK CURRENT ADDR: ",(int)&task_currnet);
 
 	uint task_stack[TASK_NUM_LIMIT][TASK_STACK_SIZE];
 	RegSet *rs[TASK_NUM_LIMIT];
@@ -58,8 +59,8 @@ int main()
 	rs[task_number]=set_task(task_stack[task_number],&init_task);
 	task_number++;
 
-	//SYSTICK_RELOAD_VALUE=5000;
-	//SYSTICK_CONTROL=SYSTICK_CONTROL_ENABLE|SYSTICK_CONTROL_CONTINUOUS;
+	SYSTICK_RELOAD_VALUE=5000;
+	SYSTICK_CONTROL=SYSTICK_CONTROL_ENABLE|SYSTICK_CONTROL_CONTINUOUS;
 
 	while(1)
 	{

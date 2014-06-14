@@ -1,5 +1,5 @@
 
-	.equ STACK_ADDR, 0x01001000
+	.equ STACK_ADDR, 0x01008000
 
 	.section "vectors"
 _start:
