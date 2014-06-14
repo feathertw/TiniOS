@@ -5,7 +5,11 @@
 
 #define TASK_NUM_LIMIT  8
 #define TASK_STACK_SIZE 256
-#define PRESERVE_REGSET 32+1
+#define PRESERVE_REGSET 32+2
+
+#define TASK_READY	0x0
+#define TASK_WAIT_READ	0x1
+#define TASK_WAIT_WRITE	0x2
 
 #define IT_FORK 	0x1
 #define IT_GETPID 	0x2
@@ -42,6 +46,7 @@ void init_task()
 RegSet *set_task(uint *task_stack, void (*start)() )
 {
 	RegSet *rs= (RegSet *)(task_stack+TASK_STACK_SIZE-PRESERVE_REGSET);
+	rs->state = TASK_READY;
 	rs->pc = (uint)start;
 	return rs;
 }
@@ -65,6 +70,7 @@ int main()
 	while(1)
 	{
 		rs[task_currnet] = to_user_mode(rs[task_currnet]);
+		rs[task_currnet]->state=TASK_READY;
 		switch(rs[task_currnet]->it_number)
 		{
 			case IT_FORK:
@@ -93,7 +99,8 @@ int main()
 			case IT_SYSTICK:
 				break;
 		}
-		task_currnet=(task_currnet+1>=task_number)?0:task_currnet+1;
+		while(TASK_READY!=rs[
+			task_currnet=(task_currnet+1>=task_number)?0:task_currnet+1]->state);
 	}
 
 	//while(1);

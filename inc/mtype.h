@@ -1,6 +1,7 @@
 typedef unsigned int uint;
 typedef struct
 {
+	uint state;
 	uint it_number;
 	uint r4;
 	uint r5;
