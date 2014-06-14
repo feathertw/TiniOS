@@ -1,5 +1,5 @@
 
-	.equ STACK_ADDR, 0x01008000
+	.equ STACK_ADDR, 0x01040000
 
 	.section "vectors"
 _start:
@@ -75,9 +75,14 @@ Syscall_Handler:
 	jr	$lp
 
 Systick_Handler:
+	mfsr	$r0, $IPSW
+	beqz	$r0, it_back
 	movi	$r3, #0x9
 	la	$lp, to_kernel_mode
 	jr	$lp
+
+it_back:
+	iret
 
 	.text
 loop:	j	loop
