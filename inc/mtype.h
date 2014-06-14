@@ -1,4 +1,26 @@
+#define PIPE_DATA_SIZE	512
+#define PIPE_PUSH(PIPE,V) \
+	do{ \
+		(PIPE).data[(PIPE).head]=(V); \
+		(PIPE).head++; \
+		if((PIPE).head>PIPE_DATA_SIZE) (PIPE).head=0; \
+	}while(0)
+#define PIPE_POP(PIPE,V) \
+	do{ \
+		(V)=(PIPE).data[(PIPE).tail]; \
+		(PIPE).tail++; \
+		if((PIPE).tail>PIPE_DATA_SIZE) (PIPE).tail=0; \
+	}while(0)
+#define PIPE_LENTH(PIPE) \
+	(PIPE).head>(PIPE).tail?(PIPE).head-(PIPE).tail:PIPE_DATA_SIZE-((PIPE).tail-(PIPE).head)
+
 typedef unsigned int uint;
+typedef struct
+{
+	uint head;
+	uint tail;
+	uint data[PIPE_DATA_SIZE];
+}Pipe_Ringbuffer;
 typedef struct
 {
 	uint state;

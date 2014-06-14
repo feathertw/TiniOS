@@ -7,6 +7,8 @@
 #define TASK_STACK_SIZE 256
 #define PRESERVE_REGSET 32+2
 
+#define PIPE_NUM_LIMIT	16
+
 #define TASK_READY	0x0
 #define TASK_WAIT_READ	0x1
 #define TASK_WAIT_WRITE	0x2
@@ -54,13 +56,16 @@ RegSet *set_task(uint *task_stack, void (*start)() )
 int main()
 {
 	mputs("THIS IS MAIN\n");
+
+	int i;
+	Pipe_Ringbuffer pipes[PIPE_NUM_LIMIT];
+	for(i=0;i<PIPE_NUM_LIMIT;i++)
+		pipes[i].head = pipes[i].tail = 0;
+
 	uint task_number =0;
 	uint task_currnet=0;
-	//mputo("TASK CURRENT ADDR: ",(int)&task_currnet);
-
 	uint task_stack[TASK_NUM_LIMIT][TASK_STACK_SIZE];
 	RegSet *rs[TASK_NUM_LIMIT];
-
 	rs[task_number]=set_task(task_stack[task_number],&init_task);
 	task_number++;
 
