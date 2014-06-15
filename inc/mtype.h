@@ -1,4 +1,4 @@
-#define PIPE_DATA_SIZE	512
+#define PIPE_DATA_SIZE	512-2
 #define PIPE_PUSH(PIPE,V) \
 	do{ \
 		(PIPE).data[(PIPE).head]=(V); \
@@ -12,7 +12,22 @@
 		if((PIPE).tail>PIPE_DATA_SIZE) (PIPE).tail=0; \
 	}while(0)
 #define PIPE_LENTH(PIPE) \
-	(PIPE).head>(PIPE).tail?(PIPE).head-(PIPE).tail:PIPE_DATA_SIZE-((PIPE).tail-(PIPE).head)
+	( (PIPE).head>=(PIPE).tail?(PIPE).head-(PIPE).tail:PIPE_DATA_SIZE-((PIPE).tail-(PIPE).head) )
+
+#define GETCHAR(C,ADDR) \
+	__asm__ __volatile__( \
+		"addi	$r1, %[addr], #0  \n\t" \
+		"la	$r2, #0xFFFFFFFC  \n\t" \
+		"and	$r3, $r1, $r2     \n\t" \
+		"lwi	$r0, [$r3+#0]     \n\t" \
+		"andi	$r3, $r1, #3	  \n\t" \
+		"slli	$r3, $r3, #3	  \n\t" \
+		"srl	$r0, $r0, $r3	  \n\t" \
+		"andi	%[dst], $r0, #0xFF\n\t" \
+		:[dst]"=r"(C) \
+		:[addr]"r"(ADDR) \
+		:"$r0","$r1","$r2","$r3" \
+	)
 
 typedef unsigned int uint;
 typedef struct

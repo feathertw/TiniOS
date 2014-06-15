@@ -19,6 +19,16 @@ getpid:
 	syscall #0x2
 	jr	$lp
 
+	.globl read
+read:
+	syscall #0x3
+	jr	$lp
+
+	.globl write
+write:
+	syscall #0x4
+	jr	$lp
+
 	.data
 check:
 	.asciz "this is systick\n"

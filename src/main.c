@@ -7,20 +7,19 @@
 #define TASK_STACK_SIZE 256
 #define PRESERVE_REGSET 32+2
 
-#define PIPE_NUM_LIMIT	16
-
-#define TASK_READY	0x0
-#define TASK_WAIT_READ	0x1
-#define TASK_WAIT_WRITE	0x2
-
 #define IT_FORK 	0x1
 #define IT_GETPID 	0x2
+#define IT_READ 	0x3
+#define IT_WRITE 	0x4
 #define IT_SYSCALL	0x8
 #define IT_SYSTICK	0x9
 
 void syscall();
 int fork();
 int getpid();
+int read(int fd, void *buff, uint size);
+int write(int fd, const void *buff, uint size);
+
 RegSet *to_user_mode(RegSet *stack);
 void counter(int t, char *s)
 {
@@ -38,9 +37,28 @@ void second_task()
 	counter(1000,"ABCDEFGHIJK\n");
 	while(1);
 }
+uint setbuff(uint *buff, char *s)
+{
+	uint c,n=0;
+	do{
+		GETCHAR(c,s+n);
+		buff[n++]=c;
+	}while(c);
+	return n;
+}
 void init_task()
 {
 	mputs("THIS IS INIT_TASK\n");
+	uint buff[100];
+	uint buff2[100];
+	int n=setbuff(buff,"HELLO");
+	write(0,buff,n);
+	read(0,buff2,n);
+	int i=0;
+	for(i=0;i<n;i++)
+		mputc(buff2[i]);
+	mputc('\n');
+
 	if( !fork() ) second_task();
 	syscall();
 	counter(1000,"abcdefghijk\n");
@@ -57,7 +75,7 @@ int main()
 {
 	mputs("THIS IS MAIN\n");
 
-	int i;
+	uint i;
 	Pipe_Ringbuffer pipes[PIPE_NUM_LIMIT];
 	for(i=0;i<PIPE_NUM_LIMIT;i++)
 		pipes[i].head = pipes[i].tail = 0;
@@ -74,8 +92,9 @@ int main()
 
 	while(1)
 	{
-		rs[task_currnet] = to_user_mode(rs[task_currnet]);
-		rs[task_currnet]->state=TASK_READY;
+		if(rs[task_currnet]->state==TASK_READY)
+			rs[task_currnet] = to_user_mode(rs[task_currnet]);
+		//rs[task_currnet]->state=TASK_READY;
 		switch(rs[task_currnet]->it_number)
 		{
 			case IT_FORK:
@@ -99,13 +118,42 @@ int main()
 			case IT_GETPID:
 				rs[task_currnet]->r0=task_currnet;
 				break;
+			case IT_READ:
+				_read(rs[task_currnet],&pipes[rs[task_currnet]->r0]);
+				if(rs[task_currnet]->state==TASK_READY)
+				{
+					for(i=0;i<task_number;i++)
+					{
+						if(rs[i]->state==TASK_WAIT_WRITE)
+							rs[i]->state=TASK_WRITE;
+					}
+				}
+				break;
+			case IT_WRITE:
+				_write(rs[task_currnet],&pipes[rs[task_currnet]->r0]);
+				if(rs[task_currnet]->state==TASK_READY)
+				{
+					for(i=0;i<task_number;i++)
+					{
+						if(rs[i]->state==TASK_WAIT_READ)
+							rs[i]->state=TASK_READ;
+					}
+				}
+				break;
+
 			case IT_SYSCALL:
 				break;
 			case IT_SYSTICK:
 				break;
 		}
-		while(TASK_READY!=rs[
-			task_currnet=(task_currnet+1>=task_number)?0:task_currnet+1]->state);
+		//while(TASK_READY!=rs[
+		//	task_currnet=(task_currnet+1>=task_number)?0:task_currnet+1]->state);
+		while(1)
+		{
+			task_currnet=(task_currnet+1>=task_number)?0:task_currnet+1;
+			uint state=rs[task_currnet]->state;
+			if(state==TASK_READY||state==TASK_READ||state==TASK_WRITE) break;
+		}
 	}
 
 	//while(1);
