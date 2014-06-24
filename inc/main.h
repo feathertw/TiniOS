@@ -4,7 +4,16 @@
 #define TASK_READ	0x3
 #define TASK_WRITE	0x4
 
-#define PIPE_NUM_LIMIT	16
+#define TASK_NUM_LIMIT  8
+#define TASK_STACK_SIZE 1024
+#define PRESERVE_REGSET 32+2
+
+#define PIPE_NUM_LIMIT		16
+#define PATH_NUM_RESERVED	3
+#define PATH_NAME_MAX		64
+
+#define MKFIFO_FD		0
+#define PATHSERVER_FD		(TASK_NUM_LIMIT+PATH_NUM_RESERVED)
 
 #define SYSTICK_CONTROL 	*(volatile int *)(0x0E100000)
 #define SYSTICK_RELOAD_VALUE 	*(volatile int *)(0x0E100004)

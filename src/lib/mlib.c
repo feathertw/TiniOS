@@ -2,11 +2,55 @@
 #include "mlib.h"
 #include "main.h"
 
+uint mkfifo(char *pathname)
+{
+	uint buff[2+PATH_NAME_MAX];
+	uint n=setbuff(buff+2,pathname);
+	buff[0]=MKFIFO_FD;
+	buff[1]=n;
+	write(PATHSERVER_FD,buff,2+n);
+	return 0;
+}
+uint open(char *pathname)
+{
+	uint replyfd = getpid()+PATH_NUM_RESERVED;
+	uint buff[2+PATH_NAME_MAX];
+	uint n=setbuff(buff+2,pathname);
+	buff[0]=replyfd;
+	buff[1]=n;
+	write(PATHSERVER_FD,buff,2+n);
+	read(replyfd, &replyfd, 1);
+	return replyfd;
+}
+uint setbuff(uint *buff, char *s)
+{
+	uint c,n=0;
+	do{
+		GETCHAR(c,s+n);
+		buff[n++]=c;
+	}while(c);
+	return n;
+}
 void mputo(char* s, int n)
 {
 	mputs(s);
 	mputn(n);
 	mputc('\n');
+}
+void mputu(uint *u)
+{
+	char c;
+	while(*u)
+	{
+		c= (*u++)&(0xFF);
+		mputc(c);
+	}
+}
+int istrcmp(const int *a, const int *b)
+{
+	int r=0;
+	while( !r && *a && *b) r=(*a++)-(*b++);
+	return r;
 }
 void *imemcpy(void *dest, void *src, uint n)
 {
