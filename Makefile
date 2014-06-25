@@ -34,11 +34,20 @@ INC+= inc/mlib.h
 INC+= inc/mtype.h
 INC+= inc/task.h
 
+NEWDIR=
+NEWDIR+= elf
+NEWDIR+= obj
+NEWDIR+= src/trans_op
+NEWDIR+= src/trans_as
+
 CFLAGS = -mno-16bit -O2 -S -nostartfiles -nostdlib -I inc
 ASFLAGS= -mno-16bit
 LDFLAGS= -T src/main.ld
 
-all: $(FILE_BIN) $(FILE_LIST) $(FILE_RELF)
+all: $(NEWDIR) $(FILE_BIN) $(FILE_LIST) $(FILE_RELF)
+
+$(NEWDIR):
+	mkdir -p $@
 
 $(FILE_RELF): $(FILE_ELF)
 	$(READELF) $^ -s > $@
