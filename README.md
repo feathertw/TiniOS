@@ -12,6 +12,6 @@ TiniOS project can run with TiniSOC project and TiniRUN project.
 Need to know
 ============
 
-* The TiniSOC CPU is based on AndesStar ISA. You can use the 2009 [nds32le-linux-glibc-V1](http://goo.gl/Kvdpu1) gnu toolchain to compiler or analysize the code.
+* The TiniSOC CPU is based on AndesStar ISA. You can use the 2009 [nds32le-linux-glibc-V1](https://goo.gl/5awLBV) gnu toolchain to compiler or analysize the code.
 
 * Memory mapping can refer the TiniSOC README.
